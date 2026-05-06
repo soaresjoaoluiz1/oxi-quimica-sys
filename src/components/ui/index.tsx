@@ -146,12 +146,18 @@ export function Modal({ open, onClose, title, children, size = 'md' }: ModalProp
 
   const sizes = { sm: 'max-w-md', md: 'max-w-lg', lg: 'max-w-2xl', xl: 'max-w-4xl' }
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={title ? 'modal-title' : undefined}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
+    >
       <div className={cn('bg-white rounded-2xl shadow-2xl w-full max-h-[90vh] flex flex-col', sizes[size])}>
         {title && (
           <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-            <h3 className="font-display text-lg font-bold text-navy-800">{title}</h3>
-            <button onClick={onClose} className="p-1 rounded-lg hover:bg-slate-100">
+            <h3 id="modal-title" className="font-display text-lg font-bold text-navy-800">{title}</h3>
+            <button onClick={onClose} aria-label="Fechar" className="p-1.5 rounded-lg hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-navy-500">
               <X className="w-5 h-5 text-slate-500" />
             </button>
           </div>

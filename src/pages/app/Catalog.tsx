@@ -130,7 +130,19 @@ export default function Catalog() {
             )}
 
             {loading ? (
-              <div className="text-center py-16 text-sm text-slate-500">Carregando catálogo…</div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="bg-white rounded-xl shadow-card overflow-hidden">
+                    <div className="aspect-square skeleton rounded-none" />
+                    <div className="p-4 space-y-2">
+                      <div className="skeleton h-4 w-3/4" />
+                      <div className="skeleton h-3 w-1/2" />
+                      <div className="skeleton h-6 w-1/3 mt-3" />
+                      <div className="skeleton h-11 w-full mt-2" />
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : products.length === 0 ? (
               <div className="text-center py-16">
                 <div className="inline-flex w-16 h-16 rounded-2xl bg-slate-100 items-center justify-center mb-4">

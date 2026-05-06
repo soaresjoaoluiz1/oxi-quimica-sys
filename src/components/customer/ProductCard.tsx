@@ -23,9 +23,22 @@ export interface ProductCardData {
 export default function ProductCard({ product, showDetails }: { product: ProductCardData; showDetails?: () => void }) {
   const { getQty, addItem, updateQty } = useCart()
   const inCart = getQty(product.id)
-  const [pulse, setPulse] = useState(false)
+  const [localQty, setLocalQty] = useState(1)
+  const [justAdded, setJustAdded] = useState(false)
 
-  function add() {
+  function increment() {
+    setLocalQty(q => Math.min(q + 1, 999))
+  }
+  function decrement() {
+    setLocalQty(q => Math.max(q - 1, 1))
+  }
+  function onQtyChange(v: string) {
+    const n = parseInt(v.replace(/\D/g, ''), 10)
+    if (Number.isFinite(n) && n > 0) setLocalQty(Math.min(n, 999))
+    else if (v === '') setLocalQty(1)
+  }
+
+  function handleAdd() {
     addItem({
       product_id: product.id,
       sku: product.sku,
@@ -36,9 +49,10 @@ export default function ProductCard({ product, showDetails }: { product: Product
       volume_m3: product.volume_m3,
       image_url: product.image_url,
       category_name: product.category_name
-    }, 1)
-    setPulse(true)
-    setTimeout(() => setPulse(false), 300)
+    }, localQty)
+    setJustAdded(true)
+    setLocalQty(1)
+    setTimeout(() => setJustAdded(false), 1400)
   }
 
   const economyPct = product.market_price && product.market_price > product.price
@@ -46,14 +60,15 @@ export default function ProductCard({ product, showDetails }: { product: Product
     : 0
 
   return (
-    <div className="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-shadow overflow-hidden flex flex-col">
+    <div className="bg-white rounded-xl shadow-card hover:shadow-card-hover transition-shadow overflow-hidden flex flex-col group">
       {/* Image area */}
       <button
         onClick={showDetails}
-        className="relative aspect-square bg-gradient-to-br from-blue-50 to-cyan-50 flex items-center justify-center overflow-hidden group"
+        aria-label={`Ver detalhes de ${product.name}`}
+        className="relative aspect-square bg-gradient-to-br from-blue-50 to-cyan-50 flex items-center justify-center overflow-hidden focus:outline-none focus:ring-2 focus:ring-navy-500 focus:ring-offset-2"
       >
         {product.image_url ? (
-          <img src={product.image_url} alt={product.name} className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform" />
+          <img src={product.image_url} alt={product.name} loading="lazy" className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform" />
         ) : (
           <div className="w-20 h-28 bg-gradient-to-br from-navy-700 to-brand-blue rounded-lg flex items-center justify-center text-white shadow-lg">
             <span className="font-display font-extrabold text-xs">{product.sku?.replace(/[a-z]/g, '') || '?'}</span>
@@ -61,11 +76,11 @@ export default function ProductCard({ product, showDetails }: { product: Product
         )}
         {economyPct > 0 && (
           <div className="absolute top-2 left-2 bg-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow flex items-center gap-1">
-            <TrendingDown className="w-3 h-3" /> {economyPct}%
+            <TrendingDown className="w-3 h-3" aria-hidden /> {economyPct}%
           </div>
         )}
         {inCart > 0 && (
-          <div className="absolute top-2 right-2 bg-brand-cyan text-white text-xs font-bold w-6 h-6 rounded-full shadow flex items-center justify-center">
+          <div className="absolute top-2 right-2 bg-brand-cyan text-white text-xs font-extrabold min-w-[24px] h-6 px-1.5 rounded-full shadow flex items-center justify-center" aria-label={`${inCart} no carrinho`}>
             {inCart}
           </div>
         )}
@@ -73,57 +88,93 @@ export default function ProductCard({ product, showDetails }: { product: Product
 
       {/* Info */}
       <div className="p-4 flex flex-col flex-1">
-        <div className="flex-1 min-h-0">
-          <button onClick={showDetails} className="text-left w-full">
-            <div className="font-semibold text-sm text-navy-800 line-clamp-2 leading-snug mb-1">{product.name}</div>
-            <div className="text-xs text-slate-400 mb-2">SKU {product.sku || '—'}</div>
+        <div className="flex-1 min-h-0 mb-3">
+          <button onClick={showDetails} className="text-left w-full focus:outline-none">
+            <div className="font-semibold text-sm text-navy-800 line-clamp-2 leading-snug mb-0.5">{product.name}</div>
+            <div className="text-[11px] text-slate-400 mb-1.5">SKU {product.sku || '—'}</div>
             {product.short_use && (
-              <div className="text-xs text-slate-500 line-clamp-2 mb-3">{product.short_use}</div>
+              <div className="text-xs text-slate-500 line-clamp-2">{product.short_use}</div>
             )}
           </button>
         </div>
 
         {/* Price + market */}
         <div className="mb-3">
-          <div className={cn('font-display font-extrabold text-xl text-emerald-600 leading-none', pulse && 'animate-pulse')}>
+          <div className="font-display font-extrabold text-xl text-emerald-600 leading-none tabular-nums">
             {fmtBRL(product.price)}
           </div>
           {product.market_price && product.market_price > product.price && (
-            <div className="text-[11px] text-slate-400 mt-0.5">
+            <div className="text-[11px] text-slate-400 mt-1 tabular-nums">
               Mercado: <span className="line-through">{fmtBRL(product.market_price)}</span>
             </div>
           )}
         </div>
 
-        {/* Buy controls */}
-        {inCart === 0 ? (
-          <button
-            onClick={add}
-            className="w-full flex items-center justify-center gap-2 bg-navy-800 hover:bg-navy-700 text-white font-bold text-sm py-2.5 rounded-lg transition active:scale-95"
-          >
-            <ShoppingCart className="w-4 h-4" /> COMPRAR
-          </button>
-        ) : (
-          <div className="flex items-center gap-2 bg-emerald-50 border-2 border-emerald-500 rounded-lg p-1">
+        {/* Quantity stepper + Add button (sempre visíveis) */}
+        <div className="flex flex-col sm:flex-row gap-2">
+          {/* Stepper */}
+          <div className="flex items-center bg-slate-100 rounded-lg overflow-hidden h-11 w-full sm:w-auto sm:flex-shrink-0">
             <button
-              onClick={() => updateQty(product.id, inCart - 1)}
-              className="w-8 h-8 rounded-md hover:bg-emerald-100 flex items-center justify-center text-emerald-700"
+              type="button"
+              onClick={decrement}
+              disabled={localQty <= 1}
+              aria-label="Diminuir quantidade"
+              className="w-10 h-11 flex items-center justify-center text-slate-700 hover:bg-slate-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-500 focus-visible:ring-inset"
             >
-              <Minus className="w-4 h-4" />
+              <Minus className="w-4 h-4" aria-hidden />
             </button>
             <input
-              type="number"
-              value={inCart}
-              onChange={e => updateQty(product.id, parseInt(e.target.value || '0', 10))}
-              className="flex-1 text-center font-bold text-emerald-700 bg-transparent outline-none text-sm"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={localQty}
+              onChange={e => onQtyChange(e.target.value)}
+              aria-label="Quantidade"
+              className="w-12 h-full text-center text-sm font-bold text-navy-800 bg-transparent outline-none tabular-nums focus:bg-white"
             />
             <button
-              onClick={add}
-              className="w-8 h-8 rounded-md hover:bg-emerald-100 flex items-center justify-center text-emerald-700"
+              type="button"
+              onClick={increment}
+              aria-label="Aumentar quantidade"
+              className="w-10 h-11 flex items-center justify-center text-slate-700 hover:bg-slate-200 active:scale-95 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-500 focus-visible:ring-inset"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4" aria-hidden />
             </button>
           </div>
+
+          {/* Add button */}
+          <button
+            type="button"
+            onClick={handleAdd}
+            aria-label={`Adicionar ${localQty} ${product.name} ao carrinho`}
+            className={cn(
+              'flex-1 h-11 rounded-lg font-bold text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+              justAdded
+                ? 'bg-emerald-500 text-white focus-visible:ring-emerald-500'
+                : 'bg-navy-800 text-white hover:bg-navy-700 focus-visible:ring-navy-500'
+            )}
+          >
+            {justAdded ? (
+              <>
+                <Check className="w-4 h-4" aria-hidden /> Adicionado
+              </>
+            ) : (
+              <>
+                <ShoppingCart className="w-4 h-4" aria-hidden /> Adicionar
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Status quando já tem no carrinho */}
+        {inCart > 0 && (
+          <button
+            type="button"
+            onClick={() => updateQty(product.id, 0)}
+            className="mt-2 text-[11px] text-slate-500 hover:text-red-500 underline transition focus:outline-none"
+          >
+            Remover do carrinho ({inCart})
+          </button>
         )}
       </div>
     </div>
