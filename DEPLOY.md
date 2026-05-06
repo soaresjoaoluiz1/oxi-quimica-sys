@@ -2,7 +2,7 @@
 
 **Servidor:** VPS Oxiquímica (mesma da LP `revendedor.oxiquimicavarginha.com.br`)
 **Domínio:** `pedidos.oxiquimicavarginha.com.br`
-**Stack:** Node 18+ · Express 4 · better-sqlite3 12 · React + Vite 4
+**Stack:** Node 16 (constraint CentOS 7 / glibc 2.17) · Express 4 · better-sqlite3 10 · React + Vite 4
 **Caminho na VPS:** `/root/oxi-pedidos`
 **PM2 process:** `dros-oxi-pedidos` na porta `3005`
 
