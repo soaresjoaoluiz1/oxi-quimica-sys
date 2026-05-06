@@ -98,15 +98,20 @@ export default function ProductCard({ product, showDetails }: { product: Product
           </button>
         </div>
 
-        {/* Price + market */}
+        {/* Price + market + lucro potencial */}
         <div className="mb-3">
           <div className="font-display font-extrabold text-xl text-emerald-600 leading-none tabular-nums">
             {fmtBRL(product.price)}
           </div>
           {product.market_price && product.market_price > product.price && (
-            <div className="text-[11px] text-slate-400 mt-1 tabular-nums">
-              Mercado: <span className="line-through">{fmtBRL(product.market_price)}</span>
-            </div>
+            <>
+              <div className="text-[11px] text-slate-400 mt-1 tabular-nums">
+                Mercado: <span className="line-through">{fmtBRL(product.market_price)}</span>
+              </div>
+              <div className="text-[11px] text-emerald-600 font-semibold tabular-nums">
+                Você pode lucrar {fmtBRL(product.market_price - product.price)}
+              </div>
+            </>
           )}
         </div>
 
