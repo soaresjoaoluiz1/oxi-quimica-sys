@@ -110,10 +110,10 @@ export default function ProductCard({ product, showDetails }: { product: Product
           )}
         </div>
 
-        {/* Quantity stepper + Add button (sempre visíveis) */}
-        <div className="flex flex-col sm:flex-row gap-2">
+        {/* Quantity stepper + Add button (sempre empilhados, mais limpo em todos breakpoints) */}
+        <div className="flex flex-col gap-2">
           {/* Stepper */}
-          <div className="flex items-center bg-slate-100 rounded-lg overflow-hidden h-11 w-full sm:w-auto sm:flex-shrink-0">
+          <div className="flex items-center bg-slate-100 rounded-lg overflow-hidden h-11 w-full">
             <button
               type="button"
               onClick={decrement}
