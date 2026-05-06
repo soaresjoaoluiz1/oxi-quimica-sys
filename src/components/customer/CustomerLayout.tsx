@@ -1,6 +1,6 @@
 import { ReactNode, useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { Search, ShoppingCart, User, LogOut, Package, Droplet, ChevronDown } from 'lucide-react'
+import { Search, ShoppingCart, User, LogOut, Package, ChevronDown } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
 import { fmtBRL } from '@/lib/format'
@@ -39,13 +39,7 @@ export default function CustomerLayout({ children, search, onSearchChange, onCar
           <div className="flex items-center gap-3 sm:gap-6 h-16">
             {/* Logo */}
             <Link to="/app" className="flex items-center gap-2 flex-shrink-0">
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-cyan to-brand-blue flex items-center justify-center shadow-md">
-                <Droplet className="w-4 h-4 text-white" fill="currentColor" />
-              </div>
-              <div className="hidden sm:block">
-                <div className="font-display font-extrabold text-navy-800 leading-none">Oxi <span className="text-brand-cyan">Pedidos</span></div>
-                <div className="text-[10px] uppercase tracking-wider text-slate-400">Catálogo do revendedor</div>
-              </div>
+              <img src="/logo.png" alt="Oxiquímica Varginha" className="h-12 w-auto" />
             </Link>
 
             {/* Search */}

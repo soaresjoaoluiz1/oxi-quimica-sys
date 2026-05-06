@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { Printer, ArrowLeft, Droplet } from 'lucide-react'
+import { Printer, ArrowLeft } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useAuth } from '@/context/AuthContext'
 import { fmtBRL, fmtNumber, fmtDateTime, STATUS_LABEL } from '@/lib/format'
@@ -54,14 +54,9 @@ export default function OrderPrint() {
         {/* Cabeçalho */}
         <div className="flex items-start justify-between mb-8 pb-6 border-b-2 border-navy-800">
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-brand-cyan to-brand-blue flex items-center justify-center">
-                <Droplet className="w-5 h-5 text-white" fill="currentColor" />
-              </div>
-              <div>
-                <div className="font-display font-extrabold text-xl text-navy-800 leading-none">Oxiquímica Varginha</div>
-                <div className="text-[10px] uppercase tracking-wider text-slate-500">Pedido de revenda</div>
-              </div>
+            <div className="flex items-center gap-3 mb-2">
+              <img src="/logo.png" alt="Oxiquímica Varginha" className="h-14 w-auto" />
+              <div className="text-[10px] uppercase tracking-wider text-slate-500 border-l border-slate-300 pl-3">Pedido de revenda</div>
             </div>
             <div className="text-xs text-slate-500 mt-2">
               Av. Dr. Módena, 723 — Fátima, Varginha/MG · CEP 37010-085<br />

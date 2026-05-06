@@ -1,6 +1,6 @@
 import { ReactNode, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Package, Tags, Layers, Users, ShoppingCart, Settings, LogOut, Menu, X, Droplet } from 'lucide-react'
+import { LayoutDashboard, Package, Tags, Layers, Users, ShoppingCart, Settings, LogOut, Menu, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { useAuth } from '@/context/AuthContext'
 
@@ -36,17 +36,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         'fixed inset-y-0 left-0 z-50 w-64 bg-navy-900 text-white flex flex-col transition-transform lg:translate-x-0',
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       )}>
-        <div className="px-6 py-5 flex items-center gap-3 border-b border-white/10">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-cyan to-brand-blue flex items-center justify-center shadow-lg">
-            <Droplet className="w-5 h-5 text-white" fill="currentColor" />
+        <div className="px-6 py-4 flex items-center gap-3 border-b border-white/10 bg-white">
+          <img src="/logo.png" alt="Oxiquímica" className="h-12 w-auto" />
+          <div className="ml-auto flex items-center gap-2">
+            <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold hidden lg:inline">Admin</span>
+            <button className="lg:hidden p-1 rounded hover:bg-slate-100" onClick={() => setSidebarOpen(false)}>
+              <X className="w-5 h-5 text-navy-800" />
+            </button>
           </div>
-          <div>
-            <div className="font-display font-extrabold text-lg leading-tight">Oxi <span className="text-brand-cyan">Pedidos</span></div>
-            <div className="text-[10px] uppercase tracking-wider text-white/50">Painel Admin</div>
-          </div>
-          <button className="ml-auto lg:hidden p-1 rounded hover:bg-white/10" onClick={() => setSidebarOpen(false)}>
-            <X className="w-5 h-5" />
-          </button>
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">

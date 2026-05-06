@@ -1,6 +1,6 @@
 import { useState, FormEvent } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Droplet, Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { Button } from '@/components/ui'
 
@@ -34,15 +34,7 @@ export default function Login() {
     <div className="min-h-screen flex flex-col bg-slate-50">
       {/* Header */}
       <header className="bg-white border-b border-slate-200 py-4 flex items-center justify-center">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-cyan to-brand-blue flex items-center justify-center shadow-lg">
-            <Droplet className="w-5 h-5 text-white" fill="currentColor" />
-          </div>
-          <div>
-            <div className="font-display font-extrabold text-lg text-navy-800 leading-tight">Oxi <span className="text-brand-cyan">Pedidos</span></div>
-            <div className="text-[10px] uppercase tracking-wider text-slate-500">Oxiquímica Varginha</div>
-          </div>
-        </div>
+        <img src="/logo.png" alt="Oxiquímica Varginha" className="h-14 w-auto" />
       </header>
 
       <main className="flex-1 flex items-center justify-center px-4 py-12">
