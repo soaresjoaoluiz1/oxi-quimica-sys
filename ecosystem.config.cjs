@@ -17,8 +17,8 @@ module.exports = {
     watch: false,
     max_memory_restart: '300M',
     env: {
-      NODE_ENV: 'production',
-      PORT: 3005
+      NODE_ENV: 'production'
+      /* PORT vem do .env (vamos com 3006 em produção pq 3005 já era do gestao-clin) */
     },
     error_file: '/root/oxi-pedidos/logs/err.log',
     out_file: '/root/oxi-pedidos/logs/out.log',

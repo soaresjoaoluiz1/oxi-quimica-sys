@@ -4,7 +4,7 @@
 **Domínio:** `pedidos.oxiquimicavarginha.com.br`
 **Stack:** Node 16 (constraint CentOS 7 / glibc 2.17) · Express 4 · better-sqlite3 10 · React + Vite 4
 **Caminho na VPS:** `/root/oxi-pedidos`
-**PM2 process:** `dros-oxi-pedidos` na porta `3005`
+**PM2 process:** `dros-oxi-pedidos` na porta `3006`
 
 ---
 
@@ -39,8 +39,8 @@ cat > /etc/httpd/conf.d/oxi-pedidos.conf <<'EOF'
 <VirtualHost *:80>
   ServerName pedidos.oxiquimicavarginha.com.br
   ProxyPreserveHost On
-  ProxyPass / http://localhost:3005/
-  ProxyPassReverse / http://localhost:3005/
+  ProxyPass / http://localhost:3006/
+  ProxyPassReverse / http://localhost:3006/
   ErrorLog /var/log/httpd/oxi-pedidos-error.log
   CustomLog /var/log/httpd/oxi-pedidos-access.log combined
 </VirtualHost>
@@ -93,7 +93,7 @@ chmod +x scripts/backup.sh
 ( crontab -l 2>/dev/null; echo "0 3 * * * /root/oxi-pedidos/scripts/backup.sh >> /root/oxi-pedidos/logs/backup.log 2>&1" ) | crontab -
 ```
 
-Testa: `curl http://localhost:3005/api/health` deve retornar JSON com `"ok":true`.
+Testa: `curl http://localhost:3006/api/health` deve retornar JSON com `"ok":true`.
 
 ---
 
@@ -153,7 +153,7 @@ pm2 restart dros-oxi-pedidos
 
 ```env
 NODE_ENV=production
-PORT=3005
+PORT=3006
 JWT_SECRET=<string-aleatoria-longa-de-no-minimo-32-chars>
 APP_URL=https://pedidos.oxiquimicavarginha.com.br
 
@@ -198,7 +198,7 @@ pm2 restart dros-oxi-pedidos
 
 ## Troubleshooting
 
-**`Error: listen EADDRINUSE :::3005`** → outro processo já usa a porta. `lsof -i :3005` pra ver qual e mata.
+**`Error: listen EADDRINUSE :::3006`** → outro processo já usa a porta. `lsof -i :3006` pra ver qual e mata.
 
 **`better-sqlite3` falha no `npm install`** → confirma que está usando Node 18: `node -v`. Se vier `v16.x`, roda `nvm use 18`.
 
