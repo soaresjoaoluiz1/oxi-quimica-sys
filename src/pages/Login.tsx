@@ -33,8 +33,8 @@ export default function Login() {
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 py-4 flex items-center justify-center">
-        <img src="/logo.png" alt="Oxiquímica Varginha" className="h-14 w-auto" />
+      <header className="bg-white border-b border-slate-200 py-6 flex items-center justify-center">
+        <img src="/logo.png" alt="Oxiquímica Varginha" className="h-24 sm:h-28 w-auto" />
       </header>
 
       <main className="flex-1 flex items-center justify-center px-4 py-12">
