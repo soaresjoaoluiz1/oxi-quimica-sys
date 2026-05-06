@@ -130,7 +130,7 @@ export default function ProductCard({ product, showDetails }: { product: Product
               value={localQty}
               onChange={e => onQtyChange(e.target.value)}
               aria-label="Quantidade"
-              className="w-12 h-full text-center text-sm font-bold text-navy-800 bg-transparent outline-none tabular-nums focus:bg-white"
+              className="flex-1 h-full text-center text-sm font-bold text-navy-800 bg-transparent outline-none tabular-nums focus:bg-white min-w-0"
             />
             <button
               type="button"
