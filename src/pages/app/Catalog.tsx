@@ -101,8 +101,7 @@ export default function Catalog() {
             {customer?.company_name || customer?.name || 'Olá'} 👋
           </h1>
           <p className="text-white/70 max-w-2xl">
-            Monte seu pedido com os produtos da <strong className="text-white">{customer?.price_table_name || 'sua tabela'}</strong>.
-            Quando finalizar, um consultor entra em contato pra fechar a entrega.
+            Monte seu pedido com os produtos desejados. Quando finalizar o envio do pedido, um consultor entra em contato pra confirmar a entrega e pagamento.
           </p>
 
           <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-6 max-w-2xl">
