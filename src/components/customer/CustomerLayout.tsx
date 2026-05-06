@@ -112,7 +112,7 @@ export default function CustomerLayout({ children, search, onSearchChange, onCar
       <footer className="bg-white border-t border-slate-200 py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center text-xs text-slate-400">
           <div className="font-display font-extrabold text-navy-800 mb-1">Oxiquímica Varginha</div>
-          <div>📞 (35) 99714-8855 · ✉️ contato@oxiquimicavarginha.com.br</div>
+          <div>📞 (35) 99742-8855 · ✉️ vendas3@oxiquimicavarginha.com.br</div>
           <div className="mt-2">© {new Date().getFullYear()} · Desenvolvido por Dros Agência</div>
         </div>
       </footer>

@@ -23,7 +23,7 @@ function shell(content, preheader = '') {
       </td></tr>
       ${content}
       <tr><td style="background:#f8fafc;padding:20px 32px;text-align:center;color:#64748b;font-size:12px;">
-        <div>Oxiquímica Varginha · (35) 99714-8855</div>
+        <div>Oxiquímica Varginha · (35) 99742-8855</div>
         <div style="margin-top:4px;">© ${new Date().getFullYear()} · Desenvolvido por Dros Agência</div>
       </td></tr>
     </table>

@@ -130,7 +130,7 @@ export default function MyOrderDetail() {
             <h3 className="font-display font-bold text-navy-800 mb-1">Precisa falar com o consultor?</h3>
             <p className="text-sm text-slate-600 mb-3">Tire dúvidas sobre seu pedido pelo WhatsApp.</p>
             <a
-              href={`https://wa.me/5535997148855?text=${encodeURIComponent(`Olá! Sobre meu pedido ${order.order_number}…`)}`}
+              href={`https://wa.me/5535997428855?text=${encodeURIComponent(`Olá! Sobre meu pedido ${order.order_number}…`)}`}
               target="_blank"
               rel="noopener noreferrer"
             >

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Sparkles, Tag, Package, Filter, X } from 'lucide-react'
+import { Sparkles, Tag, Package, Filter, X, Car, Hammer, Stethoscope, Building2, Factory, Home, Boxes } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
@@ -16,6 +16,20 @@ interface Category {
   slug: string
   icon?: string
   product_count: number
+}
+
+const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  'automotivo': Car,
+  'casa-construcao': Hammer,
+  'hospitalar': Stethoscope,
+  'corporativo': Building2,
+  'industrial-alimenticia-agro': Factory,
+  'domestico': Home
+}
+
+function CategoryIcon({ slug, className = 'w-4 h-4' }: { slug?: string; className?: string }) {
+  const Comp = (slug && CATEGORY_ICONS[slug]) || Boxes
+  return <Comp className={className} />
 }
 
 interface CatalogProduct extends ProductCardData {
@@ -225,12 +239,12 @@ function CategoryList({ categories, selectedId, onSelect, totalProducts }: {
             key={c.id}
             onClick={() => onSelect(c.id)}
             className={cn(
-              'w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm font-medium transition',
+              'w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition',
               selectedId === c.id ? 'bg-navy-100 text-navy-800' : 'text-slate-600 hover:bg-slate-50'
             )}
           >
-            <span className="flex items-center gap-2 min-w-0">
-              <span className="text-base flex-shrink-0">{c.icon || '🏷️'}</span>
+            <span className="flex items-center gap-2.5 min-w-0">
+              <CategoryIcon slug={c.slug} className={cn('w-4 h-4 flex-shrink-0', selectedId === c.id ? 'text-navy-700' : 'text-slate-500')} />
               <span className="truncate">{c.name}</span>
             </span>
             <span className={cn('text-xs flex-shrink-0', selectedId === c.id ? 'text-navy-700 font-bold' : 'text-slate-400')}>{c.product_count}</span>

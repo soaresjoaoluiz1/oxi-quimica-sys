@@ -60,7 +60,7 @@ export default function OrderPrint() {
             </div>
             <div className="text-xs text-slate-500 mt-2">
               Av. Dr. Módena, 723 — Fátima, Varginha/MG · CEP 37010-085<br />
-              (35) 99714-8855 · contato@oxiquimicavarginha.com.br
+              (35) 99742-8855 · vendas3@oxiquimicavarginha.com.br
             </div>
           </div>
           <div className="text-right">
