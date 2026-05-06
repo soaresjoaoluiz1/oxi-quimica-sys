@@ -1,6 +1,6 @@
 import { ReactNode, useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { Search, ShoppingCart, User, LogOut, Package, ChevronDown } from 'lucide-react'
+import { Search, ShoppingCart, User, LogOut, Package, ChevronDown, MessageSquare, Mail } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
 import { fmtBRL } from '@/lib/format'
@@ -109,11 +109,38 @@ export default function CustomerLayout({ children, search, onSearchChange, onCar
 
       <main className="flex-1">{children}</main>
 
-      <footer className="bg-white border-t border-slate-200 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center text-xs text-slate-400">
-          <div className="font-display font-extrabold text-navy-800 mb-1">Oxiquímica Varginha</div>
-          <div>📞 (35) 99742-8855 · ✉️ vendas3@oxiquimicavarginha.com.br</div>
-          <div className="mt-2">© {new Date().getFullYear()} · Desenvolvido por Dros Agência</div>
+      <footer className="bg-white border-t border-slate-200 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
+          <div className="font-display font-extrabold text-2xl sm:text-3xl text-navy-800 mb-4 tracking-tight">Oxiquímica Varginha</div>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-5">
+            <a
+              href="https://wa.me/5535997428855?text=Ol%C3%A1%21+Sou+revendedor+e+preciso+de+ajuda."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold shadow-sm transition active:scale-95"
+            >
+              <MessageSquare className="w-4 h-4" /> WhatsApp · (35) 99742-8855
+            </a>
+            <a
+              href="mailto:vendas3@oxiquimicavarginha.com.br"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-navy-800 hover:bg-navy-700 text-white text-sm font-semibold shadow-sm transition active:scale-95"
+            >
+              <Mail className="w-4 h-4" /> Enviar email
+            </a>
+          </div>
+
+          <div className="text-xs text-slate-400">
+            © {new Date().getFullYear()} · Desenvolvido por{' '}
+            <a
+              href="https://drosagencia.com.br"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-brand-blue hover:underline"
+            >
+              Dros Agência
+            </a>
+          </div>
         </div>
       </footer>
     </div>
