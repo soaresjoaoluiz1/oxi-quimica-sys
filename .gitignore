@@ -11,6 +11,9 @@ server/data/*.db
 server/data/*.db-shm
 server/data/*.db-wal
 
+# Uploads (cada ambiente tem seus próprios)
+server/data/uploads/
+
 # Logs
 logs
 *.log

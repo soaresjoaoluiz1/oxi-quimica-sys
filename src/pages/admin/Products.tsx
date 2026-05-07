@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Plus, Pencil, Trash2, Search, Package, Filter } from 'lucide-react'
-import { api } from '@/lib/api'
+import { Plus, Pencil, Trash2, Search, Package, Filter, Upload, X, ImagePlus } from 'lucide-react'
+import { api, getToken } from '@/lib/api'
 import { Card, Button, Input, Select, Modal, Badge, Textarea, EmptyState, toast } from '@/components/ui'
 import { PageHeader } from '@/components/admin/AdminLayout'
 import { fmtBRL } from '@/lib/format'
@@ -14,6 +14,7 @@ interface Product {
   category_id?: number
   category_name?: string
   unit?: string
+  image_url?: string
   market_price?: number
   peso_kg?: number
   volume_m3?: number
@@ -113,8 +114,17 @@ export default function Products() {
                 {products.map(p => (
                   <tr key={p.id} className="hover:bg-slate-50">
                     <td className="px-4 py-3">
-                      <div className="font-semibold text-navy-800">{p.name}</div>
-                      <div className="text-xs text-slate-500">SKU {p.sku || '—'} · {p.short_use || '—'}</div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-md bg-slate-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                          {p.image_url
+                            ? <img src={p.image_url} alt="" className="w-full h-full object-contain" />
+                            : <Package className="w-5 h-5 text-slate-300" />}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-semibold text-navy-800 truncate">{p.name}</div>
+                          <div className="text-xs text-slate-500 truncate">SKU {p.sku || '—'} · {p.short_use || '—'}</div>
+                        </div>
+                      </div>
                     </td>
                     <td className="px-4 py-3 hidden sm:table-cell text-slate-600">{p.category_name || '—'}</td>
                     <td className="px-4 py-3 hidden md:table-cell text-right font-semibold text-slate-700">{fmtBRL(p.market_price)}</td>
@@ -157,6 +167,7 @@ function ProductModal({ product, categories, onClose, onSaved }: { product: Prod
     description: product?.description || '',
     category_id: product?.category_id?.toString() || '',
     unit: product?.unit || 'un',
+    image_url: product?.image_url || '',
     market_price: product?.market_price?.toString() || '',
     peso_kg: product?.peso_kg?.toString() || '',
     volume_m3: product?.volume_m3?.toString() || '',
@@ -165,9 +176,40 @@ function ProductModal({ product, categories, onClose, onSaved }: { product: Prod
     is_active: product?.is_active !== 0
   })
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
 
   function update<K extends keyof typeof form>(k: K, v: typeof form[K]) {
     setForm(f => ({ ...f, [k]: v }))
+  }
+
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 5 * 1024 * 1024) { toast.error('Imagem muito grande (máx 5MB)'); return }
+
+    const fd = new FormData()
+    fd.append('file', file)
+
+    setUploading(true)
+    try {
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${getToken()}` },
+        body: fd
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || 'Falha no upload')
+      }
+      const data = await res.json()
+      update('image_url', data.url)
+      toast.success('Imagem enviada')
+    } catch (err: any) {
+      toast.error(err.message)
+    } finally {
+      setUploading(false)
+      e.target.value = ''
+    }
   }
 
   async function save() {
@@ -179,6 +221,7 @@ function ProductModal({ product, categories, onClose, onSaved }: { product: Prod
       description: form.description || null,
       category_id: form.category_id ? Number(form.category_id) : null,
       unit: form.unit || 'un',
+      image_url: form.image_url || null,
       market_price: form.market_price ? Number(form.market_price) : null,
       peso_kg: Number(form.peso_kg) || 0,
       volume_m3: Number(form.volume_m3) || 0,
@@ -210,6 +253,46 @@ function ProductModal({ product, categories, onClose, onSaved }: { product: Prod
         <Input label="Nome *" value={form.name} onChange={e => update('name', e.target.value)} placeholder="OXI Detergente Neutro 5L" />
         <Input label="Uso curto" value={form.short_use} onChange={e => update('short_use', e.target.value)} placeholder="Lavar carros sem danificar a pintura" />
         <Textarea label="Descrição" value={form.description} onChange={e => update('description', e.target.value)} rows={3} />
+
+        {/* Imagem do produto */}
+        <div>
+          <label className="block text-xs font-semibold text-slate-600 mb-1.5">Imagem do produto</label>
+          <div className="flex gap-3 items-start">
+            {/* Preview */}
+            <div className="w-24 h-24 rounded-lg bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+              {form.image_url ? (
+                <img src={form.image_url} alt="" className="w-full h-full object-contain p-1" />
+              ) : (
+                <ImagePlus className="w-7 h-7 text-slate-300" />
+              )}
+            </div>
+            <div className="flex-1 min-w-0 space-y-2">
+              <Input
+                value={form.image_url}
+                onChange={e => update('image_url', e.target.value)}
+                placeholder="https://... (cole uma URL ou faça upload)"
+                hint="JPG, PNG, WEBP ou GIF · máx 5MB"
+              />
+              <div className="flex gap-2 flex-wrap">
+                <label className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-navy-50 text-navy-700 text-xs font-semibold cursor-pointer hover:bg-navy-100 transition ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                  {uploading
+                    ? <><span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" /> Enviando…</>
+                    : <><Upload className="w-3.5 h-3.5" /> Enviar arquivo</>}
+                  <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleUpload} className="hidden" disabled={uploading} />
+                </label>
+                {form.image_url && (
+                  <button
+                    type="button"
+                    onClick={() => update('image_url', '')}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-semibold text-red-600 hover:bg-red-50 transition"
+                  >
+                    <X className="w-3.5 h-3.5" /> Remover
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div className="grid grid-cols-2 gap-3">
           <Select label="Categoria" value={form.category_id} onChange={e => update('category_id', e.target.value)}>
