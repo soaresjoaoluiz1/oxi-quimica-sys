@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Sparkles, Tag, Package, Filter, X, Car, Hammer, Stethoscope, Building2, Factory, Home, Boxes } from 'lucide-react'
+import { Sparkles, Tag, Package, Filter, X } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
@@ -9,6 +9,7 @@ import CartSidebar from '@/components/customer/CartSidebar'
 import ProductCard, { ProductCardData } from '@/components/customer/ProductCard'
 import { fmtBRL } from '@/lib/format'
 import { cn } from '@/lib/cn'
+import { CategoryIcon } from '@/lib/categoryIcons'
 
 interface Category {
   id: number
@@ -16,20 +17,6 @@ interface Category {
   slug: string
   icon?: string
   product_count: number
-}
-
-const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  'automotivo': Car,
-  'casa-construcao': Hammer,
-  'hospitalar': Stethoscope,
-  'corporativo': Building2,
-  'industrial-alimenticia-agro': Factory,
-  'domestico': Home
-}
-
-function CategoryIcon({ slug, className = 'w-4 h-4' }: { slug?: string; className?: string }) {
-  const Comp = (slug && CATEGORY_ICONS[slug]) || Boxes
-  return <Comp className={className} />
 }
 
 interface CatalogProduct extends ProductCardData {

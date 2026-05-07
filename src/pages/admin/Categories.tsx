@@ -3,6 +3,7 @@ import { Plus, Pencil, Trash2, Tag } from 'lucide-react'
 import { api } from '@/lib/api'
 import { Card, Button, Input, Modal, Badge, EmptyState, toast } from '@/components/ui'
 import { PageHeader } from '@/components/admin/AdminLayout'
+import { CategoryIcon } from '@/lib/categoryIcons'
 
 interface Category {
   id: number
@@ -65,7 +66,9 @@ export default function Categories() {
           <div className="divide-y divide-slate-100">
             {categories.map(c => (
               <div key={c.id} className="flex items-center gap-4 p-4 hover:bg-slate-50">
-                <div className="text-2xl flex-shrink-0">{c.icon || '🏷️'}</div>
+                <div className="w-10 h-10 rounded-lg bg-navy-50 flex items-center justify-center flex-shrink-0">
+                  <CategoryIcon slug={c.slug} className="w-5 h-5 text-navy-700" />
+                </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-semibold text-navy-800">{c.name}</span>
