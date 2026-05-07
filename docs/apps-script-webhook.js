@@ -23,6 +23,7 @@ const COLUMNS = [
   'WhatsApp',
   'Cidade/UF',
   'Objetivo',
+  'Tem R$ 1000,00 para investir',
   'Tem CNPJ',
   'Região',
   'utm_source',
@@ -52,6 +53,9 @@ const FIELD_MAP = {
   'Cidade/UF':     d => d.cidade || d.regiao || '',
   'Segmento':      d => d.segmento || '',  // legacy
   'Objetivo':      d => d.objetivo || '',
+  /* Quem chega no submit qualificou (quem disse 'não' foi pra pedido-minimo.html) */
+  'Tem R$ 1000,00 para investir':            () => 'Sim',
+  'Tem 1000 reais pra investir em produtos?': () => 'Sim',  // alt
   'Tem CNPJ':      d => d.tem_cnpj || '',
   'Região':        d => d.regiao || '',
   'utm_source':    d => d.utm_source || '',
