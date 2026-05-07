@@ -66,7 +66,10 @@ export default function ProductCard({ product, showDetails }: { product: Product
       <button
         onClick={showDetails}
         aria-label={`Ver detalhes de ${product.name}`}
-        className="relative aspect-square bg-gradient-to-br from-blue-50 to-cyan-50 flex items-center justify-center overflow-hidden focus:outline-none focus:ring-2 focus:ring-navy-500 focus:ring-offset-2"
+        className={cn(
+          'relative aspect-square flex items-center justify-center overflow-hidden focus:outline-none focus:ring-2 focus:ring-navy-500 focus:ring-offset-2 border-b border-slate-100',
+          product.image_url ? 'bg-white' : 'bg-gradient-to-br from-blue-50 to-cyan-50'
+        )}
       >
         {product.image_url ? (
           <img src={product.image_url} alt={product.name} loading="lazy" className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform" />
