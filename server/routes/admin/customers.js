@@ -8,6 +8,18 @@ function generatePassword() {
   return Math.random().toString(36).slice(-8)
 }
 
+function parseAllowedTerms(row) {
+  if (!row) return row
+  try {
+    row.allowed_payment_term_ids = row.allowed_payment_term_ids
+      ? JSON.parse(row.allowed_payment_term_ids)
+      : null
+  } catch {
+    row.allowed_payment_term_ids = null
+  }
+  return row
+}
+
 /* GET /api/admin/customers?search=&active=1&price_table_id= */
 router.get('/', (req, res) => {
   const { search, active, price_table_id } = req.query
@@ -33,21 +45,21 @@ router.get('/', (req, res) => {
     LEFT JOIN price_tables pt ON pt.id = c.price_table_id
     ${where.length ? 'WHERE ' + where.join(' AND ') : ''}
     ORDER BY c.created_at DESC
-  `).all(...params)
+  `).all(...params).map(parseAllowedTerms)
 
   res.json({ customers: rows })
 })
 
 /* GET /api/admin/customers/:id */
 router.get('/:id', (req, res) => {
-  const customer = db.prepare(`
+  const customer = parseAllowedTerms(db.prepare(`
     SELECT c.*, u.email, u.is_active AS user_active, u.last_login_at,
            pt.name AS price_table_name
     FROM customers c
     LEFT JOIN users u ON u.id = c.user_id
     LEFT JOIN price_tables pt ON pt.id = c.price_table_id
     WHERE c.id = ?
-  `).get(req.params.id)
+  `).get(req.params.id))
   if (!customer) return res.status(404).json({ error: 'Cliente não encontrado' })
 
   const orders = db.prepare(`
@@ -63,7 +75,8 @@ router.post('/', (req, res) => {
   const {
     name, company_name, email, document, document_type,
     phone, whatsapp, city, state, address, zip_code, distance_km,
-    price_table_id, minimum_order_value, notes, password
+    price_table_id, minimum_order_value, notes, password,
+    allowed_payment_term_ids
   } = req.body
   if (!name || !email) return res.status(400).json({ error: 'Nome e email são obrigatórios' })
 
@@ -85,8 +98,8 @@ router.post('/', (req, res) => {
       INSERT INTO customers (
         user_id, name, company_name, document, document_type,
         phone, whatsapp, city, state, address, zip_code, distance_km,
-        price_table_id, minimum_order_value, notes
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        price_table_id, minimum_order_value, notes, allowed_payment_term_ids
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       userId, name, company_name || null,
       document || null, document_type || null,
@@ -95,7 +108,10 @@ router.post('/', (req, res) => {
       distance_km || null,
       price_table_id || null,
       minimum_order_value || 0,
-      notes || null
+      notes || null,
+      Array.isArray(allowed_payment_term_ids) && allowed_payment_term_ids.length > 0
+        ? JSON.stringify(allowed_payment_term_ids.map(Number))
+        : null
     )
     customerId = c.lastInsertRowid
   })
@@ -115,6 +131,14 @@ router.put('/:id', (req, res) => {
   const cur = db.prepare('SELECT * FROM customers WHERE id = ?').get(req.params.id)
   if (!cur) return res.status(404).json({ error: 'Cliente não encontrado' })
   const b = req.body
+  /* allowed_payment_term_ids: undefined = não muda; null/[] = libera todos; [ids] = restringe */
+  let paymentTermsValue = undefined
+  if (b.allowed_payment_term_ids !== undefined) {
+    paymentTermsValue = (Array.isArray(b.allowed_payment_term_ids) && b.allowed_payment_term_ids.length > 0)
+      ? JSON.stringify(b.allowed_payment_term_ids.map(Number))
+      : null
+  }
+
   db.prepare(`
     UPDATE customers SET
       name = COALESCE(?, name),
@@ -132,6 +156,7 @@ router.put('/:id', (req, res) => {
       minimum_order_value = COALESCE(?, minimum_order_value),
       notes = COALESCE(?, notes),
       is_active = COALESCE(?, is_active),
+      allowed_payment_term_ids = CASE WHEN ? = 'KEEP' THEN allowed_payment_term_ids ELSE ? END,
       updated_at = datetime('now')
     WHERE id = ?
   `).run(
@@ -140,6 +165,8 @@ router.put('/:id', (req, res) => {
     b.address ?? null, b.zip_code ?? null, b.distance_km ?? null,
     b.price_table_id ?? null, b.minimum_order_value ?? null, b.notes ?? null,
     b.is_active === undefined ? null : (b.is_active ? 1 : 0),
+    paymentTermsValue === undefined ? 'KEEP' : 'UPDATE',
+    paymentTermsValue === undefined ? null : paymentTermsValue,
     req.params.id
   )
   /* Sincroniza is_active no user vinculado */

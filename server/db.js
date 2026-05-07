@@ -212,6 +212,7 @@ function ensureColumn(table, column, definition) {
 }
 
 ensureColumn('products', 'suggested_sale_price', 'REAL')
+ensureColumn('customers', 'allowed_payment_term_ids', 'TEXT')   // JSON array de IDs ou NULL = todos
 
 console.log('[db] Schema OK em', dbPath)
 

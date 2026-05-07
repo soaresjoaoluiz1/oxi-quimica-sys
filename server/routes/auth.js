@@ -36,11 +36,20 @@ router.get('/me', requireAuth, (req, res) => {
   let customer = null
   if (req.user.role === 'cliente') {
     customer = db.prepare(`
-      SELECT c.*, pt.name as price_table_name, pt.slug as price_table_slug
+      SELECT c.*,
+             pt.name as price_table_name,
+             pt.slug as price_table_slug,
+             pt.minimum_order_value AS price_table_min
       FROM customers c
       LEFT JOIN price_tables pt ON pt.id = c.price_table_id
       WHERE c.user_id = ?
     `).get(req.user.id)
+    if (customer) {
+      /* Mínimo efetivo: override do cliente OU mínimo da tabela */
+      customer.effective_minimum_order_value = (customer.minimum_order_value && customer.minimum_order_value > 0)
+        ? customer.minimum_order_value
+        : (customer.price_table_min || 0)
+    }
   }
   res.json({ user: req.user, customer })
 })

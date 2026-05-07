@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
-import { X, Plus, Minus, Trash2, ShoppingCart, Package, Box } from 'lucide-react'
+import { X, Plus, Minus, Trash2, ShoppingCart, Package, Box, AlertCircle } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
+import { useAuth } from '@/context/AuthContext'
 import { Button } from '@/components/ui'
 import { fmtBRL, fmtNumber } from '@/lib/format'
 import { useEffect } from 'react'
@@ -12,7 +13,12 @@ interface Props {
 
 export default function CartSidebar({ open, onClose }: Props) {
   const { items, subtotal, totalQty, totalPeso, totalVolume, updateQty, removeItem, clear } = useCart()
+  const { customer } = useAuth()
   const navigate = useNavigate()
+  const minimumOrderValue = (customer as any)?.effective_minimum_order_value
+    || (customer as any)?.minimum_order_value
+    || 0
+  const belowMinimum = minimumOrderValue > 0 && subtotal < minimumOrderValue
 
   useEffect(() => {
     if (!open) return
@@ -119,9 +125,26 @@ export default function CartSidebar({ open, onClose }: Props) {
                 <span className="text-2xl font-extrabold text-navy-800">{fmtBRL(subtotal)}</span>
               </div>
 
+              {belowMinimum && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-xs text-red-800 flex gap-2">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <div className="font-bold">Pedido mínimo: {fmtBRL(minimumOrderValue)}</div>
+                    <div>Faltam <strong>{fmtBRL(minimumOrderValue - subtotal)}</strong> pra finalizar.</div>
+                  </div>
+                </div>
+              )}
+
               <div className="flex gap-2">
                 <Button variant="secondary" onClick={onClose} className="flex-1">Continuar</Button>
-                <Button onClick={checkout} className="flex-[2]">Finalizar pedido</Button>
+                <Button
+                  onClick={checkout}
+                  className="flex-[2]"
+                  disabled={belowMinimum}
+                  title={belowMinimum ? `Pedido mínimo: ${fmtBRL(minimumOrderValue)}` : undefined}
+                >
+                  Finalizar pedido
+                </Button>
               </div>
 
               <button onClick={() => { if (confirm('Limpar carrinho?')) clear() }} className="text-xs text-slate-400 hover:text-red-500 w-full text-center">

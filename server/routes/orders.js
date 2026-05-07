@@ -113,6 +113,23 @@ router.post('/', requireAuth, requireCustomer, (req, res) => {
   peso = +peso.toFixed(3)
   volume = +volume.toFixed(4)
 
+  /* Valida pedido mínimo:
+     1) override do cliente (customer.minimum_order_value > 0) tem prioridade
+     2) senão usa minimum_order_value da tabela de preço */
+  let minRequired = req.customer.minimum_order_value || 0
+  if (!minRequired || minRequired === 0) {
+    const tableRow = db.prepare('SELECT minimum_order_value FROM price_tables WHERE id = ?').get(tableId)
+    minRequired = tableRow?.minimum_order_value || 0
+  }
+  if (minRequired > 0 && subtotal < minRequired) {
+    return res.status(400).json({
+      error: `Pedido mínimo de R$ ${minRequired.toFixed(2).replace('.', ',')}. Subtotal atual: R$ ${subtotal.toFixed(2).replace('.', ',')}.`,
+      code: 'MIN_ORDER_NOT_MET',
+      minimum: minRequired,
+      subtotal
+    })
+  }
+
   /* Cria pedido + items + history em transação */
   const orderNumber = generateOrderNumber()
   let orderId
@@ -188,9 +205,34 @@ async function sendOrderEmails({ orderId, customer, userEmail }) {
   }
 }
 
-/* GET /api/payment-terms — lista pra o cliente escolher no checkout */
-router.get('/_/payment-terms', requireAuth, (req, res) => {
-  const rows = db.prepare(`SELECT id, label, days FROM payment_terms WHERE is_active = 1 ORDER BY position, id`).all()
+/* GET /api/orders/_/payment-terms — lista pro cliente escolher no checkout.
+   Se o customer tem allowed_payment_term_ids definido, filtra por eles.
+   Se NULL/vazio, retorna todos (compatibilidade). */
+router.get('/_/payment-terms', requireAuth, requireCustomer, (req, res) => {
+  let allowedIds = null
+  try {
+    allowedIds = req.customer.allowed_payment_term_ids
+      ? JSON.parse(req.customer.allowed_payment_term_ids)
+      : null
+  } catch {
+    allowedIds = null
+  }
+
+  let rows
+  if (Array.isArray(allowedIds) && allowedIds.length > 0) {
+    const placeholders = allowedIds.map(() => '?').join(',')
+    rows = db.prepare(`
+      SELECT id, label, days FROM payment_terms
+      WHERE is_active = 1 AND id IN (${placeholders})
+      ORDER BY position, id
+    `).all(...allowedIds)
+  } else {
+    rows = db.prepare(`
+      SELECT id, label, days FROM payment_terms
+      WHERE is_active = 1 ORDER BY position, id
+    `).all()
+  }
+
   res.json({ payment_terms: rows })
 })
 

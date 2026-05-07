@@ -29,13 +29,16 @@ interface Customer {
   last_login_at?: string
   orders_count: number
   total_spent: number
+  allowed_payment_term_ids?: number[] | null
 }
 
 interface PriceTable { id: number; name: string }
+interface PaymentTerm { id: number; label: string; days: string }
 
 export default function Customers() {
   const [customers, setCustomers] = useState<Customer[]>([])
   const [priceTables, setPriceTables] = useState<PriceTable[]>([])
+  const [paymentTerms, setPaymentTerms] = useState<PaymentTerm[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [editing, setEditing] = useState<Customer | 'new' | null>(null)
@@ -46,12 +49,14 @@ export default function Customers() {
     try {
       const params = new URLSearchParams()
       if (search) params.set('search', search)
-      const [c, pt] = await Promise.all([
+      const [c, pt, ptms] = await Promise.all([
         api.get<{ customers: Customer[] }>(`/admin/customers${params.toString() ? '?' + params : ''}`),
-        api.get<{ price_tables: PriceTable[] }>('/admin/price-tables')
+        api.get<{ price_tables: PriceTable[] }>('/admin/price-tables'),
+        api.get<{ payment_terms: PaymentTerm[] }>('/admin/payment-terms')
       ])
       setCustomers(c.customers)
       setPriceTables(pt.price_tables)
+      setPaymentTerms(ptms.payment_terms)
     } finally { setLoading(false) }
   }
 
@@ -146,6 +151,7 @@ export default function Customers() {
         <CustomerModal
           customer={editing === 'new' ? null : editing}
           priceTables={priceTables}
+          paymentTerms={paymentTerms}
           onClose={() => setEditing(null)}
           onSaved={(creds) => {
             setEditing(null)
@@ -165,7 +171,8 @@ export default function Customers() {
   )
 }
 
-function CustomerModal({ customer, priceTables, onClose, onSaved }: { customer: Customer | null; priceTables: PriceTable[]; onClose: () => void; onSaved: (creds?: { email: string; password: string }) => void }) {
+function CustomerModal({ customer, priceTables, paymentTerms, onClose, onSaved }: { customer: Customer | null; priceTables: PriceTable[]; paymentTerms: PaymentTerm[]; onClose: () => void; onSaved: (creds?: { email: string; password: string }) => void }) {
+  const initialAllowed = customer?.allowed_payment_term_ids ?? null
   const [form, setForm] = useState({
     name: customer?.name || '',
     company_name: customer?.company_name || '',
@@ -185,7 +192,13 @@ function CustomerModal({ customer, priceTables, onClose, onSaved }: { customer: 
     is_active: customer?.is_active !== 0,
     password: ''
   })
+  const [allTermsAllowed, setAllTermsAllowed] = useState<boolean>(initialAllowed === null)
+  const [allowedTermIds, setAllowedTermIds] = useState<number[]>(Array.isArray(initialAllowed) ? initialAllowed : [])
   const [saving, setSaving] = useState(false)
+
+  function toggleTerm(id: number) {
+    setAllowedTermIds(ids => ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id])
+  }
 
   function update<K extends keyof typeof form>(k: K, v: typeof form[K]) {
     setForm(f => ({ ...f, [k]: v }))
@@ -210,7 +223,9 @@ function CustomerModal({ customer, priceTables, onClose, onSaved }: { customer: 
       price_table_id: form.price_table_id ? Number(form.price_table_id) : null,
       minimum_order_value: Number(form.minimum_order_value) || 0,
       notes: form.notes || null,
-      is_active: form.is_active
+      is_active: form.is_active,
+      /* null/[] = todos disponíveis · array com IDs = restrito */
+      allowed_payment_term_ids: allTermsAllowed ? null : allowedTermIds
     }
     if (!customer) {
       payload.email = form.email
@@ -277,6 +292,41 @@ function CustomerModal({ customer, priceTables, onClose, onSaved }: { customer: 
         </div>
 
         <Textarea label="Observações internas" value={form.notes} onChange={e => update('notes', e.target.value)} rows={2} />
+
+        {/* Prazos de pagamento permitidos pra este cliente */}
+        <div className="border border-slate-200 rounded-lg p-4 bg-slate-50">
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Prazos de pagamento liberados</label>
+          </div>
+          <label className="flex items-center gap-2 cursor-pointer mb-3">
+            <input type="checkbox" checked={allTermsAllowed} onChange={e => setAllTermsAllowed(e.target.checked)} className="w-4 h-4" />
+            <span className="text-sm text-slate-700">Liberar <strong>todos</strong> os prazos cadastrados</span>
+          </label>
+          {!allTermsAllowed && (
+            <div className="space-y-1.5 pl-6 border-l-2 border-slate-300">
+              <div className="text-xs text-slate-500 mb-1.5">Marque apenas os prazos que esse cliente pode usar:</div>
+              {paymentTerms.length === 0
+                ? <div className="text-xs text-slate-500">Nenhum prazo cadastrado em Configurações.</div>
+                : paymentTerms.map(pt => (
+                    <label key={pt.id} className="flex items-center gap-2 cursor-pointer text-sm">
+                      <input
+                        type="checkbox"
+                        checked={allowedTermIds.includes(pt.id)}
+                        onChange={() => toggleTerm(pt.id)}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-slate-700">{pt.label}</span>
+                      <span className="text-xs text-slate-400">({pt.days} dias)</span>
+                    </label>
+                  ))}
+              {!allTermsAllowed && allowedTermIds.length === 0 && (
+                <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1.5 mt-2">
+                  ⚠ Nenhum prazo selecionado — cliente não vai conseguir finalizar pedido.
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
         <label className="flex items-center gap-2 cursor-pointer">
           <input type="checkbox" checked={form.is_active} onChange={e => update('is_active', e.target.checked)} className="w-4 h-4" />

@@ -43,11 +43,18 @@ export default function Checkout() {
     if (items.length === 0 && step !== 'done') navigate('/app')
   }, [items, step, navigate])
 
-  const minimumOrderValue = (customer as any)?.minimum_order_value || 0
+  /* Pedido mínimo efetivo: override do cliente OU mínimo da tabela */
+  const minimumOrderValue = (customer as any)?.effective_minimum_order_value
+    || (customer as any)?.minimum_order_value
+    || 0
   const belowMinimum = minimumOrderValue > 0 && subtotal < minimumOrderValue
 
   async function submit() {
     if (!paymentTerm) { toast.error('Escolha um prazo de pagamento'); return }
+    if (belowMinimum) {
+      toast.error(`Pedido mínimo de ${fmtBRL(minimumOrderValue)}. Adicione mais produtos.`)
+      return
+    }
     setSubmitting(true)
     try {
       const res = await api.post<{ id: number; order_number: string }>('/orders', {
@@ -209,20 +216,34 @@ export default function Checkout() {
               </div>
 
               {belowMinimum && (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-900 mb-3">
-                  <strong>Pedido mínimo {fmtBRL(minimumOrderValue)}.</strong><br />
-                  Faltam {fmtBRL(minimumOrderValue - subtotal)} pra atingir o mínimo da sua tabela.
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-xs text-red-800 mb-3">
+                  <div className="font-bold mb-0.5">⚠ Pedido mínimo: {fmtBRL(minimumOrderValue)}</div>
+                  <div>Faltam <strong>{fmtBRL(minimumOrderValue - subtotal)}</strong> pra você poder finalizar.</div>
                 </div>
               )}
 
               {step === 'cart' && (
-                <Button onClick={() => setStep('payment')} className="w-full" size="lg">
-                  Definir pagamento <ArrowRight className="w-4 h-4" />
+                <Button
+                  onClick={() => setStep('payment')}
+                  className="w-full"
+                  size="lg"
+                  disabled={belowMinimum}
+                  title={belowMinimum ? `Pedido mínimo: ${fmtBRL(minimumOrderValue)}` : undefined}
+                >
+                  {belowMinimum ? `Faltam ${fmtBRL(minimumOrderValue - subtotal)}` : 'Definir pagamento'}
+                  {!belowMinimum && <ArrowRight className="w-4 h-4" />}
                 </Button>
               )}
               {step === 'payment' && (
                 <div className="space-y-2">
-                  <Button onClick={submit} loading={submitting} className="w-full" size="lg" variant="success">
+                  <Button
+                    onClick={submit}
+                    loading={submitting}
+                    disabled={belowMinimum}
+                    className="w-full"
+                    size="lg"
+                    variant="success"
+                  >
                     <Check className="w-4 h-4" /> Confirmar pedido
                   </Button>
                   <Button onClick={() => setStep('cart')} variant="ghost" className="w-full">
