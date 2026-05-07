@@ -258,9 +258,12 @@ function ProductDetailContent({ product }: { product: CatalogProduct }) {
 
   return (
     <div className="space-y-4">
-      <div className="aspect-video bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl flex items-center justify-center">
+      <div className={cn(
+        'aspect-video rounded-xl flex items-center justify-center border border-slate-100',
+        product.image_url ? 'bg-white' : 'bg-gradient-to-br from-blue-50 to-cyan-50'
+      )}>
         {product.image_url ? (
-          <img src={product.image_url} className="max-h-full max-w-full p-6" />
+          <img src={product.image_url} className="max-h-full max-w-full p-6 object-contain" />
         ) : (
           <div className="w-32 h-44 bg-gradient-to-br from-navy-700 to-brand-blue rounded-xl flex items-center justify-center text-white shadow-lg">
             <span className="font-display font-extrabold">{product.sku?.replace(/[a-z]/g, '')}</span>
