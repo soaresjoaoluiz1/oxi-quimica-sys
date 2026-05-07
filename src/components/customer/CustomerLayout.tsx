@@ -109,25 +109,37 @@ export default function CustomerLayout({ children, search, onSearchChange, onCar
 
       <main className="flex-1">{children}</main>
 
-      <footer className="bg-white border-t border-slate-200 py-8">
+      <footer className="bg-white border-t border-slate-200 py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
-          <div className="font-display font-extrabold text-2xl sm:text-3xl text-navy-800 mb-4 tracking-tight">Oxiquímica Varginha</div>
+          {/* Logo */}
+          <img src="/logo.png" alt="Oxiquímica Varginha" className="h-16 sm:h-20 w-auto mx-auto mb-4" />
 
-          <div className="flex flex-wrap items-center justify-center gap-3 mb-5">
-            <a
-              href="https://wa.me/5535997428855?text=Ol%C3%A1%21+Sou+revendedor+e+preciso+de+ajuda."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold shadow-sm transition active:scale-95"
-            >
-              <MessageSquare className="w-4 h-4" /> WhatsApp · (35) 99742-8855
-            </a>
-            <a
-              href="mailto:vendas3@oxiquimicavarginha.com.br"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-navy-800 hover:bg-navy-700 text-white text-sm font-semibold shadow-sm transition active:scale-95"
-            >
-              <Mail className="w-4 h-4" /> Enviar email
-            </a>
+          {/* Razão social + CNPJ */}
+          <div className="text-sm text-navy-800 font-semibold">Oxi Química Varginha LTDA</div>
+          <div className="text-xs text-slate-500 mb-4">CNPJ 00.000.000/0001-00</div>
+
+          {/* Contatos como links de texto */}
+          <div className="text-sm text-slate-600 space-y-1 mb-5">
+            <div>
+              WhatsApp:{' '}
+              <a
+                href="https://wa.me/5535997428855?text=Ol%C3%A1%21+Sou+revendedor+e+preciso+de+ajuda."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-brand-blue hover:underline"
+              >
+                (35) 99742-8855
+              </a>
+            </div>
+            <div>
+              Email:{' '}
+              <a
+                href="mailto:vendas3@oxiquimicavarginha.com.br"
+                className="font-semibold text-brand-blue hover:underline"
+              >
+                vendas3@oxiquimicavarginha.com.br
+              </a>
+            </div>
           </div>
 
           <div className="text-xs text-slate-400">
