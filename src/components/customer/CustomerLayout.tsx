@@ -116,7 +116,7 @@ export default function CustomerLayout({ children, search, onSearchChange, onCar
 
           {/* Razão social + CNPJ */}
           <div className="text-sm text-navy-800 font-semibold">Oxi Química Varginha LTDA</div>
-          <div className="text-xs text-slate-500 mb-4">CNPJ 00.000.000/0001-00</div>
+          <div className="text-xs text-slate-500 mb-4">CNPJ 65.271.868/0001-7</div>
 
           {/* Contatos como links de texto */}
           <div className="text-sm text-slate-600 space-y-1 mb-5">
