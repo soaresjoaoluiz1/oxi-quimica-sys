@@ -16,6 +16,7 @@ interface Product {
   unit?: string
   image_url?: string
   market_price?: number
+  suggested_sale_price?: number
   peso_kg?: number
   volume_m3?: number
   tags?: string[]
@@ -169,6 +170,7 @@ function ProductModal({ product, categories, onClose, onSaved }: { product: Prod
     unit: product?.unit || 'un',
     image_url: product?.image_url || '',
     market_price: product?.market_price?.toString() || '',
+    suggested_sale_price: product?.suggested_sale_price?.toString() || '',
     peso_kg: product?.peso_kg?.toString() || '',
     volume_m3: product?.volume_m3?.toString() || '',
     tags: (product?.tags || []).join(', '),
@@ -223,6 +225,7 @@ function ProductModal({ product, categories, onClose, onSaved }: { product: Prod
       unit: form.unit || 'un',
       image_url: form.image_url || null,
       market_price: form.market_price ? Number(form.market_price) : null,
+      suggested_sale_price: form.suggested_sale_price ? Number(form.suggested_sale_price) : null,
       peso_kg: Number(form.peso_kg) || 0,
       volume_m3: Number(form.volume_m3) || 0,
       tags: form.tags ? form.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
@@ -299,8 +302,10 @@ function ProductModal({ product, categories, onClose, onSaved }: { product: Prod
             <option value="">Sem categoria</option>
             {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </Select>
-          <Input label="Preço médio mercado (R$)" type="number" step="0.01" value={form.market_price} onChange={e => update('market_price', e.target.value)} placeholder="0.00" hint="Referência exibida no catálogo" />
+          <Input label="Preço médio mercado (R$)" type="number" step="0.01" value={form.market_price} onChange={e => update('market_price', e.target.value)} placeholder="0.00" hint="Referência de mercado" />
         </div>
+
+        <Input label="Preço sugerido de venda (R$)" type="number" step="0.01" value={form.suggested_sale_price} onChange={e => update('suggested_sale_price', e.target.value)} placeholder="0.00" hint="Preço que o revendedor pode praticar — exibido no catálogo do cliente" />
 
         <div className="grid grid-cols-2 gap-3">
           <Input label="Peso (kg)" type="number" step="0.01" value={form.peso_kg} onChange={e => update('peso_kg', e.target.value)} hint="Pra resumo de transporte" />

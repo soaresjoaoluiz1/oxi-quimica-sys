@@ -23,6 +23,50 @@ function inferPesoVolume(name) {
   return { peso: 1.0, volume: 0.001 } // default
 }
 
+/* Regras de margem por categoria — espelha o catálogo digital catalogo-oxi-mercado.html.
+   Margem = % aplicado sobre o preço de revenda pra obter o preço sugerido de venda. */
+const MARGIN_RULES = {
+  'Automotivo': {
+    default: 80,
+    rules: { 'agua': 70, 'car': 80, 'car plus': 85, 'flu': 90, 'limpneu': 85, 'pan': 75, 'pan plus': 80, 'sil': 85, 'alumen': 75, 'ativado': 80 }
+  },
+  'Casa & Construção': {
+    default: 75,
+    rules: { 'clean': 80, 'clor': 70, 'detergente neutro': 70, 'hipoclor': 65, 'liquid': 70, 'lp': 80, 'multlimp': 70, 'pine': 80, 'pos obra': 85, 'aquafloc': 90, 'limpa canil': 80 }
+  },
+  'Hospitalar': {
+    default: 95,
+    rules: { 'cloroxi': 90, 'enzime': 100, 'clean': 90, 'clor': 85, 'liquid': 85 }
+  },
+  'Corporativo': {
+    default: 75,
+    rules: { 'clean': 80, 'clor': 70, 'hipoclor': 65, 'liquid': 70, 'lp': 80, 'pine': 80, 'pos obra': 85, 'multlimp': 70, 'detergente neutro': 70 }
+  },
+  'Ind. Alimentícia & Agro': {
+    default: 85,
+    rules: { 'acid': 90, 'alcalino': 95, 'alcalino foamy': 85, 'caustic': 90, 'clor': 80, 'deterfood': 85, 'detergente neutro': 75, 'hipoclor': 70, 'liquid': 75, 'liquid pronto': 80, 'lub': 80, 'pan': 75, 'peracetic': 70, 'pine': 80, 'sanit': 95 }
+  },
+  'Doméstico': {
+    default: 70,
+    rules: { 'agua sanitaria': 60, 'lava louças': 65, 'detergente lava': 65, 'lava roupas 400': 80, 'lava roupas 800': 80, 'lava roupas 1': 75, 'lava roupas 4': 70, 'multlimp': 65, 'desinfetante': 70, 'amaciante': 75 }
+  }
+}
+
+export function getMargin(cat, name) {
+  const r = MARGIN_RULES[cat] || { default: 70, rules: {} }
+  const n = (name || '').toLowerCase()
+  for (const [key, val] of Object.entries(r.rules)) {
+    if (n.includes(key)) return val
+  }
+  return r.default
+}
+
+/* Preço sugerido de venda = revenda * (1 + margem%) */
+export function calcSuggestedSalePrice(rev, cat, name) {
+  const mg = getMargin(cat, name)
+  return +(rev * (1 + mg / 100)).toFixed(2)
+}
+
 const RAW = [
   // AUTOMOTIVO
   {c:"4147",n:"OXI Água Desmineralizada 1L",cat:"Automotivo",rev:2.90,mkt:8.90,use:"Radiador, bateria e ferro de passar",desc:"Água pura sem minerais para radiadores, baterias e ferros de passar. Evita ferrugem e acúmulo de sujeira nos equipamentos.",tags:["Radiador","Bateria"]},
@@ -132,6 +176,7 @@ export const PRODUCTS = RAW.map(p => {
     category: p.cat,
     rev_price: p.rev,
     market_price: p.mkt,
+    suggested_sale_price: calcSuggestedSalePrice(p.rev, p.cat, p.n),
     short_use: p.use,
     description: p.desc,
     tags: p.tags,

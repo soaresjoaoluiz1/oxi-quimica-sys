@@ -10,7 +10,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "seed": "node server/seed.js",
-    "seed:reset": "node server/seed.js --reset"
+    "seed:reset": "node server/seed.js --reset",
+    "seed:prices": "node server/seed-prices.js",
+    "seed:prices:force": "node server/seed-prices.js --force"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

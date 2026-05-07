@@ -56,19 +56,20 @@ router.get('/:id', (req, res) => {
 router.post('/', (req, res) => {
   const {
     sku, name, short_use, description, category_id, unit, image_url,
-    market_price, peso_kg, volume_m3, tags, featured
+    market_price, suggested_sale_price, peso_kg, volume_m3, tags, featured
   } = req.body
   if (!name) return res.status(400).json({ error: 'Nome é obrigatório' })
 
   try {
     const r = db.prepare(`
       INSERT INTO products (sku, name, short_use, description, category_id, unit, image_url,
-                            market_price, peso_kg, volume_m3, tags, featured)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            market_price, suggested_sale_price, peso_kg, volume_m3, tags, featured)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       sku || null, name, short_use || null, description || null,
       category_id || null, unit || 'un', image_url || null,
-      market_price || null, peso_kg || 0, volume_m3 || 0,
+      market_price || null, suggested_sale_price || null,
+      peso_kg || 0, volume_m3 || 0,
       tags ? JSON.stringify(tags) : null,
       featured ? 1 : 0
     )
@@ -95,6 +96,7 @@ router.put('/:id', (req, res) => {
       unit = COALESCE(?, unit),
       image_url = COALESCE(?, image_url),
       market_price = COALESCE(?, market_price),
+      suggested_sale_price = COALESCE(?, suggested_sale_price),
       peso_kg = COALESCE(?, peso_kg),
       volume_m3 = COALESCE(?, volume_m3),
       tags = COALESCE(?, tags),
@@ -105,7 +107,8 @@ router.put('/:id', (req, res) => {
   `).run(
     b.sku ?? null, b.name ?? null, b.short_use ?? null, b.description ?? null,
     b.category_id ?? null, b.unit ?? null, b.image_url ?? null,
-    b.market_price ?? null, b.peso_kg ?? null, b.volume_m3 ?? null,
+    b.market_price ?? null, b.suggested_sale_price ?? null,
+    b.peso_kg ?? null, b.volume_m3 ?? null,
     b.tags !== undefined ? JSON.stringify(b.tags) : null,
     b.featured === undefined ? null : (b.featured ? 1 : 0),
     b.is_active === undefined ? null : (b.is_active ? 1 : 0),

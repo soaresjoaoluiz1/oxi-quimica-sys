@@ -202,6 +202,17 @@ db.exec(`
   );
 `)
 
+/* ── Migrations idempotentes (rodam toda vez, só aplicam se necessário) ── */
+function ensureColumn(table, column, definition) {
+  const cols = db.prepare(`PRAGMA table_info(${table})`).all()
+  if (!cols.find(c => c.name === column)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`)
+    console.log(`[db] Migration: ${table}.${column} adicionada`)
+  }
+}
+
+ensureColumn('products', 'suggested_sale_price', 'REAL')
+
 console.log('[db] Schema OK em', dbPath)
 
 export default db

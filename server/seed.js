@@ -85,8 +85,8 @@ function seedPaymentTerms() {
 
 function seedProducts(catMap, priceTableIds) {
   const insertProd = db.prepare(`
-    INSERT INTO products (sku, name, short_use, description, category_id, unit, market_price, peso_kg, volume_m3, tags)
-    VALUES (?, ?, ?, ?, ?, 'un', ?, ?, ?, ?)
+    INSERT INTO products (sku, name, short_use, description, category_id, unit, market_price, suggested_sale_price, peso_kg, volume_m3, tags)
+    VALUES (?, ?, ?, ?, ?, 'un', ?, ?, ?, ?, ?)
   `)
   const insertPrice = db.prepare(`
     INSERT INTO price_table_items (price_table_id, product_id, price)
@@ -98,7 +98,7 @@ function seedProducts(catMap, priceTableIds) {
       const catId = catMap[p.category] || null
       const r = insertProd.run(
         p.sku, p.name, p.short_use, p.description, catId,
-        p.market_price, p.peso_kg, p.volume_m3, JSON.stringify(p.tags)
+        p.market_price, p.suggested_sale_price, p.peso_kg, p.volume_m3, JSON.stringify(p.tags)
       )
       const productId = r.lastInsertRowid
       // Mesmo preço base nas 3 tabelas (admin diferencia depois)

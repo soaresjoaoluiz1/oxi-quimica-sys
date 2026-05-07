@@ -284,18 +284,21 @@ function ProductDetailContent({ product }: { product: CatalogProduct }) {
         <div className="text-sm text-slate-600 bg-slate-50 rounded-xl p-4 leading-relaxed" dangerouslySetInnerHTML={{ __html: product.description }} />
       )}
 
-      <div className="grid grid-cols-2 gap-3 text-sm bg-blue-50 rounded-xl p-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm bg-blue-50 rounded-xl p-4">
         <div>
           <div className="text-xs text-slate-500">Seu preço</div>
-          <div className="font-display text-2xl font-extrabold text-emerald-600">{fmtBRL(product.price)}</div>
+          <div className="font-display text-2xl font-extrabold text-emerald-600 tabular-nums">{fmtBRL(product.price)}</div>
         </div>
-        {product.market_price && product.market_price > product.price && (
+        {product.market_price && (
           <div>
             <div className="text-xs text-slate-500">Preço médio mercado</div>
-            <div className="font-display text-lg font-bold text-slate-700 line-through">{fmtBRL(product.market_price)}</div>
-            <div className="text-xs text-emerald-600 font-bold">
-              Você pode lucrar {fmtBRL(product.market_price - product.price)}
-            </div>
+            <div className="font-display text-lg font-bold text-slate-700 line-through tabular-nums">{fmtBRL(product.market_price)}</div>
+          </div>
+        )}
+        {product.suggested_sale_price && (
+          <div>
+            <div className="text-xs text-slate-500">Sugerido de venda</div>
+            <div className="font-display text-lg font-bold text-navy-700 tabular-nums">{fmtBRL(product.suggested_sale_price)}</div>
           </div>
         )}
       </div>

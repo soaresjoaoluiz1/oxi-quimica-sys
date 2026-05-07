@@ -13,6 +13,7 @@ export interface ProductCardData {
   unit?: string
   image_url?: string
   market_price?: number
+  suggested_sale_price?: number
   peso_kg?: number
   volume_m3?: number
   tags?: string[]
@@ -98,20 +99,20 @@ export default function ProductCard({ product, showDetails }: { product: Product
           </button>
         </div>
 
-        {/* Price + market + lucro potencial */}
-        <div className="mb-3">
+        {/* Preço seu / mercado / sugerido de venda */}
+        <div className="mb-3 space-y-0.5">
           <div className="font-display font-extrabold text-xl text-emerald-600 leading-none tabular-nums">
             {fmtBRL(product.price)}
           </div>
-          {product.market_price && product.market_price > product.price && (
-            <>
-              <div className="text-[11px] text-slate-400 mt-1 tabular-nums">
-                Mercado: <span className="line-through">{fmtBRL(product.market_price)}</span>
-              </div>
-              <div className="text-[11px] text-emerald-600 font-semibold tabular-nums">
-                Você pode lucrar {fmtBRL(product.market_price - product.price)}
-              </div>
-            </>
+          {product.market_price && (
+            <div className="text-[11px] text-slate-400 tabular-nums">
+              Mercado: <span className="line-through">{fmtBRL(product.market_price)}</span>
+            </div>
+          )}
+          {product.suggested_sale_price && (
+            <div className="text-[11px] text-navy-700 font-semibold tabular-nums">
+              Sugerido de venda: {fmtBRL(product.suggested_sale_price)}
+            </div>
           )}
         </div>
 
